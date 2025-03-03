@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="/enable-threads.js"></script>
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <title>web-python</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1 style="font-family: monospace, monospace">web-python</h1>
+      <div id="controls">
+        <div class="controls-block">
+          <label for="project-directory" class="button"
+            >Select project directory<button
+              id="project-directory"
+            ></button></label
+          ><span class="handle-name" id="project-directory-name"
+            >No directory selected</span
+          >
+        </div>
+        <div class="controls-block">
+          <label for="python-args">Python arguments</label>
+          <input
+            type="text"
+            id="python-args"
+            placeholder="main.py arg1 arg2 --flag"
+          />
+        </div>
+        <div class="controls-block">
+          <label class="button" for="run-button"
+            >Run<button id="run-button" disabled></button></label
+          ><label class="button" for="stop-button" style="margin-left: 4px"
+            >Stop<button id="stop-button" disabled></button></label
+          ><label class="button" for="clear-button" style="margin-left: 4px"
+            >Clear<button
+              id="clear-button"
+              onclick="document.getElementById('stdout').textContent = ''"
+            ></button
+          ></label>
+        </div>
+        <div class="controls-block">
+          <input
+            type="checkbox"
+            id="mypy-run-checkbox"
+            name="mypy-run-checkbox"
+            checked
+          /><label for="mypy-run-checkbox">Mypy type checking</label>
+        </div>
+      </div>
+      <span data-kind="error" id="error-message"></span>
+      <div id="terminal">
+        <code class="terminal-panel" id="stdout"></code>
+        <div id="stdout-resize"></div>
+        <code class="terminal-panel" id="mypy-output"></code>
+      </div>
+      <script type="module" src="/src/main.js"></script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,262 @@
+import "./style.css";
+
+import PythonRunner from "./worker/python-runner";
+import MypyTypeChecker from "./worker/mypy-type-checker";
+
+import { set, get } from "https://unpkg.com/idb-keyval@5.0.2/dist/esm/index.js";
+
+set("projectDirectoryHandle", undefined);
+
+let pythonRunner = new PythonRunner();
+let mypyTypeChecker = new MypyTypeChecker();
+
+/**
+ * @returns {boolean}
+ */
+function isStdoutScrolledDown() {
+  const stdout = document.getElementById("stdout");
+  return (
+    Math.abs(stdout.scrollHeight - stdout.scrollTop - stdout.clientHeight) < 10 // arbitrary tolerance
+  );
+}
+
+/**
+ * @param {string} text
+ */
+function stdoutFunc(text) {
+  const stdout = document.getElementById("stdout");
+  const isScrolled = isStdoutScrolledDown();
+  const contentElem = document.createElement("span");
+  contentElem.textContent = `${text}\n`;
+  stdout.appendChild(contentElem);
+  if (isScrolled) stdout.scrollTop = stdout.scrollHeight;
+}
+
+/**
+ * @param {string} text
+ */
+function stderrFunc(text) {
+  const stdout = document.getElementById("stdout");
+  const isScrolled = isStdoutScrolledDown();
+  const contentElem = document.createElement("span");
+  contentElem.textContent = `${text}\n`;
+  contentElem.setAttribute("data-kind", "error");
+  stdout.appendChild(contentElem);
+  if (isScrolled) if (isScrolled) stdout.scrollTop = stdout.scrollHeight;
+}
+
+pythonRunner.stdoutFunc = stdoutFunc;
+pythonRunner.stderrFunc = stderrFunc;
+
+/**
+ * @type {boolean}
+ */
+let stdoutResizeSelected = false;
+
+document
+  .getElementById("stdout-resize")
+  .addEventListener("mousedown", (_event) => {
+    stdoutResizeSelected = true;
+    document.body.addEventListener("mousemove", resizingMove);
+    document.body.addEventListener("mouseup", finishResizing);
+  });
+
+/**
+ * @param {MouseEvent} event
+ */
+function resizingMove(event) {
+  if (stdoutResizeSelected) {
+    const stdout = document.getElementById("stdout");
+    const stdoutRect = stdout.getBoundingClientRect();
+    stdout.style.width = `${event.clientX - stdoutRect.left - 25}px`;
+  } else {
+    finishResizing();
+  }
+}
+
+const finishResizing = () => {
+  stdoutResizeSelected = false;
+  document.body.removeEventListener("mouseup", finishResizing);
+  document
+    .getElementById("stdout-resize")
+    .removeEventListener("mousemove", resizingMove);
+};
+
+/**
+ * @returns {Promise<FileSystemDirectoryHandle>}
+ */
+async function requestProjectDirectory() {
+  if (!("showDirectoryPicker" in window))
+    throw new Error(
+      "This browser does not support file system directory handles."
+    );
+
+  let handle;
+
+  try {
+    handle = await window.showDirectoryPicker({
+      mode: "readwrite",
+    });
+  } catch (e) {
+    console.error(e);
+    throw Error("Could not open project directory (see developer console).");
+  }
+
+  if (
+    !("requestPermission" in handle) ||
+    (await handle.requestPermission()) !== "granted"
+  ) {
+    throw new Error(
+      "This browser does not support writable file system directory handles."
+    );
+  }
+
+  return handle;
+}
+
+/**
+ * @param {boolean} ready
+ */
+function setIsReady(ready) {
+  document.getElementById("run-button").disabled = !ready;
+  document.getElementById("stop-button").disabled = ready;
+}
+
+setIsReady(false);
+
+document.getElementById("project-directory").onclick = async () => {
+  const projectDirectoryNameElement = document.getElementById(
+    "project-directory-name"
+  );
+
+  try {
+    const handle = await requestProjectDirectory();
+    await set("projectDirectoryHandle", handle);
+
+    projectDirectoryNameElement.textContent = handle.name;
+    projectDirectoryNameElement.removeAttribute("data-kind");
+
+    setIsReady(true);
+  } catch (e) {
+    if (await get("projectDirectoryHandle")) {
+      // Project directory already set, ignore error
+      return;
+    }
+    projectDirectoryNameElement.textContent = `Error: ${e.message}`;
+    projectDirectoryNameElement.setAttribute("data-kind", "error");
+    setIsReady(false);
+  }
+};
+
+document.getElementById("mypy-run-checkbox").onchange = async (event) => {
+  const mypyOutput = document.getElementById("mypy-output");
+  const stdout = document.getElementById("stdout");
+  const stdoutResize = document.getElementById("stdout-resize");
+  const checked = event.currentTarget.checked;
+
+  mypyTypeChecker.active = checked;
+  mypyOutput.style.display = checked ? "block" : "none";
+  stdoutResize.style.display = checked ? "block" : "none";
+  stdout.style.width = checked ? "70%" : "100%";
+
+  // Store user mypy start state
+  await set("mypyTypeChecking", checked);
+};
+
+// Get user mypy start state
+const mypyStartChecked = await get("mypyTypeChecking");
+document.getElementById("mypy-run-checkbox").checked = mypyStartChecked;
+document.getElementById("mypy-run-checkbox").dispatchEvent(new Event("change"));
+
+/**
+ * @param {MypyResult} output
+ */
+function showMypyOutput(output) {
+  const mypyOutput = document.getElementById("mypy-output");
+  const mypyOutputHeader = document.createElement("span");
+  mypyOutputHeader.textContent = `[mypy report @ ${new Date().toLocaleTimeString()}]\n\n`;
+
+  const errorSpan = document.createElement("span");
+  errorSpan.setAttribute("data-kind", output[2] ? "error" : "success");
+
+  errorSpan.textContent = output[0] ? output[0] + "\n\n" : "";
+
+  const infoSpan = document.createElement("span");
+  infoSpan.setAttribute("data-kind", "warning");
+
+  infoSpan.textContent = output[1];
+
+  mypyOutput.textContent = "";
+
+  mypyOutput.appendChild(mypyOutputHeader);
+  mypyOutput.appendChild(errorSpan);
+  mypyOutput.appendChild(infoSpan);
+}
+
+mypyTypeChecker.typeCheckedCallback = showMypyOutput;
+mypyTypeChecker.typeCheckForever();
+
+document.getElementById("stop-button").onclick = async () => {
+  await pythonRunner.stop();
+};
+
+document.getElementById("run-button").onclick = async () => {
+  setIsReady(false);
+
+  try {
+    let directoryHandle = await get("projectDirectoryHandle");
+    if (!directoryHandle) {
+      alert("Please select a project directory first.");
+      return;
+    }
+
+    const pythonArgsElement = document.getElementById("python-args");
+    const pythonArgs = pythonArgsElement.value.replace(/"/g, '\\"');
+
+    if (!pythonArgs) {
+      alert("Please enter Python arguments.");
+      return;
+    }
+
+    let output = await pythonRunner.runPython(
+      `
+    import json
+    import shlex
+    json.dumps(shlex.split("${pythonArgs}"))
+    `
+    );
+
+    if (output.error) {
+      alert(output.error);
+      return;
+    }
+
+    const args = JSON.parse(output.result);
+
+    /** @type {string[]} */
+    const pathSegments = args[0].split("/");
+    const subDirectories = pathSegments.slice(0, -1);
+
+    for (const subDirectory of subDirectories) {
+      directoryHandle = await directoryHandle.getDirectoryHandle(subDirectory);
+    }
+
+    const pythonContent = await (
+      await (
+        await directoryHandle.getFileHandle(
+          pathSegments[pathSegments.length - 1]
+        )
+      ).getFile()
+    ).text();
+
+    const result = await pythonRunner.runPython(pythonContent, args.slice(1));
+
+    if (result.error) {
+      stderrFunc(result.error);
+    }
+  } catch (e) {
+    alert(e.message);
+  }
+
+  setIsReady(true);
+};
