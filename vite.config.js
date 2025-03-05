@@ -8,6 +8,11 @@ export default defineConfig({
   plugins: [wasm(), mkcert(), crossOriginIsolation()],
   build: {
     target: "ES2022",
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        about: "about.html",
+      },
+    },
   },
-  base: "/web_python/",
 });

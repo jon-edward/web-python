@@ -9,11 +9,11 @@
  *
  * @typedef {Object} StdoutMessage
  * @property {"stdout"} kind
- * @property {string} stdout
+ * @property {uint8array} stdout
  *
  * @typedef {Object} StderrMessage
  * @property {"stderr"} kind
- * @property {string} stderr
+ * @property {uint8array} stderr
  *
  * @typedef {Object} PingMessage
  * @property {"ping"} kind
@@ -125,16 +125,17 @@ export default class WorkerApi {
 
   /**
    * @param {string} python
-   * @param {string[]} args The arguments to pass to the Python interpreter. This includes the file name
+   * @param {Object} options
+   * @param {boolean} syncFs
    * @returns {Promise<FinishedMessage>}
    */
-  async runPython(python, args = [], syncFs = true) {
+  async runPython(python, options = {}, syncFs = true) {
     await this.#_initPromise;
     this.#_interruptBuffer[0] = 0;
     return await this.#_sendMessageAwaitable({
       kind: "run",
       python,
-      args,
+      options,
       syncFs,
     });
   }

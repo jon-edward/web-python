@@ -9,10 +9,16 @@
   </head>
   <body>
     <div id="app">
-      <h1 style="font-family: monospace, monospace">web-python</h1>
+      <h1>web-python</h1>
+      <label class="button pinned-right"
+        ><a id="about-button" href="about.html">About</a></label
+      >
       <div id="controls">
         <div class="controls-block">
-          <label for="project-directory" class="button"
+          <label
+            for="project-directory"
+            class="button"
+            title="Select project directory. Must be writable"
             >Select project directory<button
               id="project-directory"
             ></button></label
@@ -21,15 +27,27 @@
           >
         </div>
         <div class="controls-block">
-          <label for="python-args">Python arguments</label>
-          <input
-            type="text"
-            id="python-args"
-            placeholder="main.py arg1 arg2 --flag"
-          />
+          <label
+            id="python-args-label"
+            for="python-args"
+            title="Arguments to pass to the Python interpreter"
+            >Python arguments
+            <input
+              type="text"
+              id="python-args"
+              size="40"
+              placeholder="main.py arg1 arg2 --key value" /><span
+              class="error-span"
+              data-kind="error"
+              id="python-args-error-span"
+            ></span
+          ></label>
         </div>
         <div class="controls-block">
-          <label class="button" for="run-button"
+          <label
+            class="button"
+            for="run-button"
+            title="Run Python code. The file is determined by the Python arguments"
             >Run<button id="run-button" disabled></button></label
           ><label class="button" for="stop-button" style="margin-left: 4px"
             >Stop<button id="stop-button" disabled></button></label
@@ -40,13 +58,31 @@
             ></button
           ></label>
         </div>
+        <div
+          class="controls-block"
+          title="Enable/disable automatic mypy type checking"
+        >
+          <label for="mypy-run-checkbox"
+            ><input
+              type="checkbox"
+              id="mypy-run-checkbox"
+              name="mypy-run-checkbox"
+              checked
+            />Mypy type checking</label
+          >
+        </div>
         <div class="controls-block">
-          <input
-            type="checkbox"
-            id="mypy-run-checkbox"
-            name="mypy-run-checkbox"
-            checked
-          /><label for="mypy-run-checkbox">Mypy type checking</label>
+          <label
+            for="clear-when-run-checkbox"
+            title="Clear terminal before running Python code"
+          >
+            <input
+              type="checkbox"
+              id="clear-when-run-checkbox"
+              name="clear-when-run-checkbox"
+              checked
+            />Clear terminal when run</label
+          >
         </div>
       </div>
       <span data-kind="error" id="error-message"></span>

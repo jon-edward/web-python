@@ -26,7 +26,7 @@ const mountPoint = "/home/pyodide/";
  * @property {number} id
  * @property {string} python
  * @property {boolean} syncFs
- * @property {string[] | undefined} args
+ * @property {Object} options
  *
  * @typedef {Object} PingMessage A request to respond whenever able.
  * @property {"ping"} kind
@@ -83,7 +83,9 @@ async function onRun(message) {
   let result;
   let error;
 
-  const { python, id, filename, syncFs } = message;
+  const { python, id, options, syncFs } = message;
+
+  let oldArgs;
 
   try {
     const pyodide = await pyodidePromise;
@@ -103,6 +105,11 @@ async function onRun(message) {
     // Run Python and send uncaught errors to stderr
     try {
       await pyodide.loadPackage("micropip", loadPackagesOptions);
+
+      const requirementsLocals = pyodide.toPy({
+        requirementsHash,
+        mountPoint,
+      });
 
       // Install all requirements if requirements.txt has changed
       requirementsHash = await pyodide.runPythonAsync(
@@ -125,7 +132,7 @@ async function onRun(message) {
 
             hex_digest = md5.hexdigest()
 
-            if hex_digest != "${requirementsHash}":
+            if hex_digest != requirementsHash:
                 hex_digest = md5.hexdigest()
                 reqs = [x.strip() for x in req_content.decode("utf-8").split("\\n") if x.strip()]
                 await micropip.install(reqs, keep_going=True)
@@ -134,21 +141,63 @@ async function onRun(message) {
             if not hasattr(module, "__file__") or not module.__file__:
                 continue
             
-            if module.__file__.startswith("${mountPoint}"):
+            if module.__file__.startswith(mountPoint):
                 del sys.modules[name]
 
         hex_digest
-    `
+    `,
+        { locals: requirementsLocals }
       );
+
+      if (options.args) {
+        // Hack, replaces sys.argv
+
+        oldArgs = await pyodide.runPythonAsync(
+          `
+            import sys
+            sys.argv
+          `
+        );
+
+        await pyodide.runPythonAsync(
+          `
+          import sys
+          sys.argv = args
+        `,
+          {
+            locals: pyodide.toPy({
+              args: options.args,
+            }),
+          }
+        );
+      }
 
       await pyodide.loadPackagesFromImports(python, loadPackagesOptions);
 
-      if (filename) {
-        result = await pyodide.runPythonAsync(python, { filename });
-      } else {
-        result = await pyodide.runPythonAsync(python);
+      const filename = options.filename || "<exec>";
+
+      const opts = {};
+
+      if (options.locals) {
+        opts.locals = pyodide.toPy({
+          ...options.locals,
+        });
       }
-    } catch {
+
+      if (options.globals) {
+        opts.globals = pyodide.toPy({
+          ...options.globals,
+        });
+      }
+
+      if (options.filename) {
+        opts.filename = filename;
+      }
+
+      result = await pyodide.runPythonAsync(python, opts);
+      if (result && typeof result.toJs === "function") result = result.toJs();
+    } catch (e) {
+      console.error(e);
       error = await pyodide.runPythonAsync(
         `
         import sys
@@ -160,20 +209,33 @@ async function onRun(message) {
         "".join(traceback.format_exception(None, value=exc, tb=tb))
       `
       );
+    } finally {
+      if (options.args) {
+        await pyodide.runPythonAsync(
+          `
+          import sys
+          sys.argv = oldArgs
+        `,
+          {
+            locals: pyodide.toPy({
+              oldArgs,
+            }),
+          }
+        );
+      }
     }
 
     if (nativefs !== undefined) {
       if (syncFs) await nativefs.syncfs();
-
       // To see remote changes that occur between the end of this run
       // and the start of the next run, the mounted directory needs to be
       // remounted.
       pyodide.FS.unmount(mountPoint);
-
       if (syncFs) await nativefs.syncfs();
     }
   } catch (e) {
     error = e.message;
+    console.error(e);
   }
 
   self.postMessage({ kind: "finished", result, error, id });

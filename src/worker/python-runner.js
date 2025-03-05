@@ -17,7 +17,6 @@ export default class PythonRunner extends WorkerApi {
    * @returns {void}
    */
   onStderr(message) {
-    console.log("stderr:", message.stderr);
     this.stderrFunc(message.stderr);
   }
 

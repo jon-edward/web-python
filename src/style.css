@@ -16,14 +16,24 @@ body {
   font-size: medium;
 }
 
+#about-button {
+  text-decoration: none;
+  color: inherit;
+}
+
 #controls {
   margin-bottom: 20px;
 }
 
+h1,
+h2,
+h3 {
+  font-family: monospace, monospace;
+}
+
 .controls-block {
   display: block;
-  margin: 4px;
-  margin-top: 8px;
+  margin-top: 7px;
 }
 
 h1 > img {
@@ -38,17 +48,45 @@ p {
   display: none;
 }
 
+.pinned-right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
 .button {
+  vertical-align: middle;
   text-decoration: none;
   font-size: medium;
   background-color: #eeeeee;
   color: #1f1f1f;
-  padding: 1px 6px;
+  padding: 3px 6px;
   border-radius: 3px;
+  user-select: none;
+  border: 1px solid #1f1f1f;
+}
+
+code,
+pre {
+  font-size: large;
+  background-color: #eeeeee;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+input[type="text"] {
+  /* vertical-align: middle; */
+  font-size: small;
+  padding: 5px 6px;
+  margin-top: 2px;
+  border-radius: 3px;
+  border: 1px solid #1f1f1f;
+  font-family: monospace, monospace;
 }
 
 .button:hover {
   background-color: #d9d9d9;
+  cursor: pointer;
 }
 
 .controls-block:has(.button > button[disabled]) {
@@ -60,9 +98,11 @@ p {
 .button:has(> button[disabled]) {
   background-color: #757575;
   color: #303030;
+  cursor: default;
 }
 
-.handle-name {
+.handle-name,
+.error-span {
   margin-left: 10px;
   font-family: monospace, monospace;
   font-size: small;
@@ -127,6 +167,22 @@ p {
     color: white;
   }
 
+  .button {
+    background-color: #1f1f1f;
+    color: #eeeeee;
+    border: none;
+  }
+
+  .button:hover {
+    background-color: #333333;
+  }
+
+  input[type="text"] {
+    border: none;
+    background-color: #1f1f1f;
+    color: #eeeeee;
+  }
+
   a {
     color: #7568ff;
   }
@@ -147,5 +203,10 @@ p {
   *[data-kind="error"] {
     color: rgb(255, 104, 104);
     font-weight: bold;
+  }
+
+  code,
+  pre {
+    background-color: #1f1f1f;
   }
 }

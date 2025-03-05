@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="/enable-threads.js"></script>
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <title>About web-python</title>
+  </head>
+  <body>
+    <script type="module" src="/src/about.js"></script>
+    <div id="app">
+      <label class="button pinned-right" for="close-button"
+        >Back<button id="close-button" onclick="window.history.back()"></button
+      ></label>
+      <h1>about web-python</h1>
+      <p>
+        <code>web-python</code> is a web-based Python interpreter powered by
+        <a href="https://pyodide.org/">Pyodide</a>, leveraging its
+        <a
+          href="https://pyodide.org/en/stable/usage/file-system.html#experimental-using-the-native-file-system-in-the-browser"
+          >experimental local directory mounting feature</a
+        >
+        to sync the WASM filesystem with a local writable directory.
+      </p>
+      <p>
+        This feature is not yet available on all browsers. See
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/API/Window/showDirectoryPicker"
+          >documentation for <code>showDirectoryPicker</code></a
+        >
+        for more information.
+      </p>
+      <h2>using external packages</h2>
+      <p>
+        By including a <code>requirements.txt</code> file in your directory
+        root, you can specify external Python packages to be installed in the
+        interpreter before execution.
+      </p>
+      <p style="margin-bottom: 0">
+        Lines of <code>requirements.txt</code> are fed directly to
+        <a href="https://micropip.pyodide.org/en/stable/project/usage.html"
+          ><code>micropip.install</code></a
+        >. So, if you want to use <code>numpy</code>, <code>pandas</code>, and
+        <code>matplotlib</code>, then write a <code>requirements.txt</code> file
+        with the following content:
+      </p>
+      <pre>
+numpy
+pandas
+matplotlib</pre
+      >
+      <p>This makes them available to Python code.</p>
+      <h2>ads??</h2>
+      <p>
+        Ads help support the development of this project. But, I understand that
+        if you're using this on a regular basis you might want to turn them off.
+        You can turn off ads by adding a <code>disable-ads</code> query
+        parameter to the URL. No questions asked.
+      </p>
+      <p>
+        If you want to support my work directly, you can
+        <a href="https://buymeacoffee.com/jon.edward">buy me a cup of coffee</a
+        >. Thanks!
+      </p>
+    </div>
+  </body>
+</html>

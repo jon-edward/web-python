@@ -2,6 +2,8 @@
 
 import WorkerApi from "./worker-api";
 
+import { get } from "https://unpkg.com/idb-keyval@5.0.2/dist/esm/index.js";
+
 /**
  * @typedef {[string, string, number]} MypyResult
  */
@@ -53,7 +55,9 @@ export default class MypyTypeChecker extends WorkerApi {
                 py_hash.update(chunk)
         
         py_hash.hexdigest()
-      `
+      `,
+      {},
+      false
     );
     if (pythonResult.error) {
       if (pythonResult.error.includes("No Python source files.")) {
@@ -84,6 +88,11 @@ export default class MypyTypeChecker extends WorkerApi {
    * @returns {Promise<void>}
    */
   async typeCheckProjectDirectory() {
+    if (!(await get("projectDirectoryHandle"))) {
+      this.typeCheckedCallback(["", "No directory selected", 1]);
+      return;
+    }
+
     try {
       if (!(await this.projectDirectoryHasChanged())) {
         return;
@@ -103,6 +112,8 @@ export default class MypyTypeChecker extends WorkerApi {
       return;
     }
 
+    this.typeCheckedCallback(["", "Type checking...", 1]);
+
     const pythonResult = await this.runPython(
       `
         import micropip
@@ -116,7 +127,7 @@ export default class MypyTypeChecker extends WorkerApi {
 
         json.dumps(result)
       `,
-      [],
+      {},
       false
     );
 

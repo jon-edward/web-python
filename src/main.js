@@ -5,8 +5,6 @@ import MypyTypeChecker from "./worker/mypy-type-checker";
 
 import { set, get } from "https://unpkg.com/idb-keyval@5.0.2/dist/esm/index.js";
 
-set("projectDirectoryHandle", undefined);
-
 let pythonRunner = new PythonRunner();
 let mypyTypeChecker = new MypyTypeChecker();
 
@@ -66,6 +64,9 @@ document
  */
 function resizingMove(event) {
   if (stdoutResizeSelected) {
+    document.body.style.setProperty("user-select", "none");
+    document.body.style.setProperty("-moz-user-select", "none");
+
     const stdout = document.getElementById("stdout");
     const stdoutRect = stdout.getBoundingClientRect();
     stdout.style.width = `${event.clientX - stdoutRect.left - 25}px`;
@@ -77,6 +78,10 @@ function resizingMove(event) {
 const finishResizing = () => {
   stdoutResizeSelected = false;
   document.body.removeEventListener("mouseup", finishResizing);
+
+  document.body.style.removeProperty("user-select");
+  document.body.style.removeProperty("-moz-user-select");
+
   document
     .getElementById("stdout-resize")
     .removeEventListener("mousemove", resizingMove);
@@ -124,6 +129,19 @@ function setIsReady(ready) {
 
 setIsReady(false);
 
+async function refreshProjectDirectory() {
+  const handle = await get("projectDirectoryHandle");
+  if (handle) {
+    document.getElementById("project-directory-name").textContent = handle.name;
+    document
+      .getElementById("project-directory-name")
+      .removeAttribute("data-kind");
+  }
+  setIsReady(!!handle);
+}
+
+await refreshProjectDirectory();
+
 document.getElementById("project-directory").onclick = async () => {
   const projectDirectoryNameElement = document.getElementById(
     "project-directory-name"
@@ -132,11 +150,7 @@ document.getElementById("project-directory").onclick = async () => {
   try {
     const handle = await requestProjectDirectory();
     await set("projectDirectoryHandle", handle);
-
-    projectDirectoryNameElement.textContent = handle.name;
-    projectDirectoryNameElement.removeAttribute("data-kind");
-
-    setIsReady(true);
+    await refreshProjectDirectory();
   } catch (e) {
     if (await get("projectDirectoryHandle")) {
       // Project directory already set, ignore error
@@ -163,10 +177,25 @@ document.getElementById("mypy-run-checkbox").onchange = async (event) => {
   await set("mypyTypeChecking", checked);
 };
 
+document.getElementById("clear-when-run-checkbox").onchange = async (event) => {
+  const checked = event.currentTarget.checked;
+  await set("clearTerminalWhenRun", checked);
+};
+
 // Get user mypy start state
 const mypyStartChecked = await get("mypyTypeChecking");
 document.getElementById("mypy-run-checkbox").checked = mypyStartChecked;
 document.getElementById("mypy-run-checkbox").dispatchEvent(new Event("change"));
+
+const clearTerminalWhenRunStartChecked = await get("clearTerminalWhenRun");
+document.getElementById("clear-when-run-checkbox").checked =
+  clearTerminalWhenRunStartChecked;
+document
+  .getElementById("clear-when-run-checkbox")
+  .dispatchEvent(new Event("change"));
+
+const pythonArgsStart = await get("pythonArgs");
+document.getElementById("python-args").value = pythonArgsStart || "";
 
 /**
  * @param {MypyResult} output
@@ -200,63 +229,97 @@ document.getElementById("stop-button").onclick = async () => {
   await pythonRunner.stop();
 };
 
+class RunnerError extends Error {}
+
+document.getElementById("python-args").oninput = (event) => {
+  document.getElementById("python-args-error-span").textContent = "";
+};
+
 document.getElementById("run-button").onclick = async () => {
   setIsReady(false);
+
+  document.getElementById("python-args-error-span").textContent = "";
+
+  if (document.getElementById("clear-when-run-checkbox").checked) {
+    document.getElementById("stdout").textContent = "";
+  }
 
   try {
     let directoryHandle = await get("projectDirectoryHandle");
     if (!directoryHandle) {
-      alert("Please select a project directory first.");
-      return;
+      throw new Error("Directory handle not set.");
     }
 
     const pythonArgsElement = document.getElementById("python-args");
-    const pythonArgs = pythonArgsElement.value.replace(/"/g, '\\"');
+    const pythonArgs = pythonArgsElement.value;
 
     if (!pythonArgs) {
-      alert("Please enter Python arguments.");
-      return;
+      throw new RunnerError("No Python arguments provided.");
     }
 
     let output = await pythonRunner.runPython(
       `
-    import json
-    import shlex
-    json.dumps(shlex.split("${pythonArgs}"))
-    `
+        import json
+        import os
+        import shlex
+        split_args = shlex.split(pythonArgs)
+        
+        (split_args, os.path.normpath(split_args[0] if len(split_args) > 0 else "").split(os.sep))
+      `,
+      {
+        locals: {
+          pythonArgs,
+        },
+      }
     );
 
     if (output.error) {
-      alert(output.error);
-      return;
+      // Error happened while parsing arguments
+      stderrFunc(output.error);
+      throw new RunnerError(`Error parsing Python arguments. Check terminal.`);
     }
 
-    const args = JSON.parse(output.result);
+    const [splitArgs, pythonPathSegments] = output.result;
 
-    /** @type {string[]} */
-    const pathSegments = args[0].split("/");
-    const subDirectories = pathSegments.slice(0, -1);
+    let pythonContent = "";
 
-    for (const subDirectory of subDirectories) {
-      directoryHandle = await directoryHandle.getDirectoryHandle(subDirectory);
+    try {
+      const subDirectories = pythonPathSegments.slice(0, -1);
+      for (const subDirectory of subDirectories) {
+        directoryHandle = await directoryHandle.getDirectoryHandle(
+          subDirectory
+        );
+      }
+      pythonContent = await (
+        await (
+          await directoryHandle.getFileHandle(
+            pythonPathSegments[pythonPathSegments.length - 1]
+          )
+        ).getFile()
+      ).text();
+    } catch (e) {
+      throw new RunnerError(
+        `Error reading Python file at path: ${pythonPathSegments.join("/")}`
+      );
     }
 
-    const pythonContent = await (
-      await (
-        await directoryHandle.getFileHandle(
-          pathSegments[pathSegments.length - 1]
-        )
-      ).getFile()
-    ).text();
+    await set("pythonArgs", pythonArgs);
 
-    const result = await pythonRunner.runPython(pythonContent, args.slice(1));
+    const result = await pythonRunner.runPython(pythonContent, {
+      filename: pythonPathSegments[pythonPathSegments.length - 1],
+      args: splitArgs,
+    });
 
     if (result.error) {
       stderrFunc(result.error);
     }
   } catch (e) {
-    alert(e.message);
+    if (e instanceof RunnerError) {
+      document.getElementById("python-args-error-span").textContent = e.message;
+    } else {
+      alert(e);
+    }
+  } finally {
+    setIsReady(true);
   }
-
-  setIsReady(true);
 };
