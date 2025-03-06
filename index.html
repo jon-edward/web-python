@@ -2,8 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="google-adsense-account" content="ca-pub-5595948816944550" />
+    <meta name="description" content="Web-based Python interpreter" />
+    <meta name="author" content="jon-edward" />
+    <meta name="keywords" content="python, web, interpreter, pyodide, wasm" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google-adsense-account" content="ca-pub-5595948816944550" />
     <link rel="icon" type="image/png" href="/favicon.ico" />
     <title>web-python</title>
     <script type="text/javascript">
@@ -30,14 +33,18 @@
   <body>
     <div id="app">
       <h1>web-python</h1>
-      <label class="button pinned-right"
-        ><a id="about-button" href="about.html">About</a></label
+      <a
+        id="about-button"
+        class="button pinned-right enter-key-triggerable"
+        href="about.html"
+        >About</a
       >
       <div id="controls">
         <div class="controls-block">
           <label
             for="project-directory"
-            class="button"
+            tabindex="0"
+            class="button enter-key-triggerable"
             title="Select project directory. Must be writable"
             >Select project directory<button
               id="project-directory"
@@ -65,24 +72,35 @@
         </div>
         <div class="controls-block">
           <label
-            class="button"
+            class="button enter-key-triggerable"
             for="run-button"
+            tabindex="0"
             title="Run Python code. The file is determined by the Python arguments"
             >Run<button id="run-button" disabled></button></label
-          ><label class="button" for="stop-button" style="margin-left: 4px"
+          ><label
+            class="button enter-key-triggerable"
+            for="stop-button"
+            style="margin-left: 4px"
+            tabindex="0"
+            title="Stop running Python code"
             >Stop<button id="stop-button" disabled></button></label
-          ><label class="button" for="clear-button" style="margin-left: 4px"
+          ><label
+            class="button enter-key-triggerable"
+            for="clear-button"
+            style="margin-left: 4px"
+            tabindex="0"
+            title="Clear terminal"
             >Clear<button
               id="clear-button"
               onclick="document.getElementById('stdout').textContent = ''"
             ></button
           ></label>
         </div>
-        <div
-          class="controls-block"
-          title="Enable/disable automatic mypy type checking"
-        >
-          <label for="mypy-run-checkbox"
+        <div class="controls-block">
+          <label
+            for="mypy-run-checkbox"
+            class="enter-key-triggerable"
+            title="Enable/disable automatic mypy type checking"
             ><input
               type="checkbox"
               id="mypy-run-checkbox"
@@ -94,6 +112,7 @@
         <div class="controls-block">
           <label
             for="clear-when-run-checkbox"
+            class="enter-key-triggerable"
             title="Clear terminal before running Python code"
           >
             <input

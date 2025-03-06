@@ -10,7 +10,10 @@
   <body>
     <script type="module" src="/src/about.js"></script>
     <div id="app">
-      <label class="button pinned-right" for="close-button"
+      <label
+        tabindex="0"
+        class="button pinned-right enter-key-triggerable"
+        for="close-button"
         >Back<button id="close-button" onclick="window.history.back()"></button
       ></label>
       <h1>about web-python</h1>
