@@ -73,9 +73,12 @@ document
 
 document
   .getElementById("stdout-resize")
-  .addEventListener("touchstart", (_event) => {
+  .addEventListener("touchstart", (event) => {
+    event.preventDefault();
     stdoutResizeSelected = true;
-    document.body.addEventListener("touchmove", resizingMove);
+    document.body.addEventListener("touchmove", resizingMove, {
+      passive: false,
+    });
     document.body.addEventListener("touchend", finishResizing);
   });
 
@@ -90,6 +93,7 @@ function resizingMove(event) {
     let clientX = event.clientX;
 
     if (event.type === "touchmove") {
+      event.preventDefault();
       clientX = event.touches[0].clientX;
     }
 
