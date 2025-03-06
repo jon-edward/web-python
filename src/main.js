@@ -87,9 +87,15 @@ function resizingMove(event) {
     document.body.style.setProperty("user-select", "none");
     document.body.style.setProperty("-moz-user-select", "none");
 
+    let clientX = event.clientX;
+
+    if (event.type === "touchmove") {
+      clientX = event.touches[0].clientX;
+    }
+
     const stdout = document.getElementById("stdout");
     const stdoutRect = stdout.getBoundingClientRect();
-    stdout.style.width = `${event.clientX - stdoutRect.left - 25}px`;
+    stdout.style.width = `${clientX - stdoutRect.left - 25}px`;
   } else {
     finishResizing();
   }
