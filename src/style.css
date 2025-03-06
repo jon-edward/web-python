@@ -16,8 +16,12 @@ body {
   font-size: medium;
 }
 
-#about-button {
+.link-button {
   text-decoration: none;
+  color: inherit;
+}
+
+.link-button:visited {
   color: inherit;
 }
 
