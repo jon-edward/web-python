@@ -71,6 +71,14 @@ document
     document.body.addEventListener("mouseup", finishResizing);
   });
 
+document
+  .getElementById("stdout-resize")
+  .addEventListener("touchstart", (_event) => {
+    stdoutResizeSelected = true;
+    document.body.addEventListener("touchmove", resizingMove);
+    document.body.addEventListener("touchend", finishResizing);
+  });
+
 /**
  * @param {MouseEvent} event
  */
@@ -90,6 +98,7 @@ function resizingMove(event) {
 const finishResizing = () => {
   stdoutResizeSelected = false;
   document.body.removeEventListener("mouseup", finishResizing);
+  document.body.removeEventListener("touchend", finishResizing);
 
   document.body.style.removeProperty("user-select");
   document.body.style.removeProperty("-moz-user-select");
@@ -97,6 +106,9 @@ const finishResizing = () => {
   document
     .getElementById("stdout-resize")
     .removeEventListener("mousemove", resizingMove);
+  document
+    .getElementById("stdout-resize")
+    .removeEventListener("touchmove", resizingMove);
 };
 
 /**
