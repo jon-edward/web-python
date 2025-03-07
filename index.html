@@ -32,7 +32,8 @@
   </head>
   <body>
     <div id="app">
-      <h1>web-python: Web-based Python interpreter</h1>
+      <h1 style="margin-bottom: 8px">web-python</h1>
+      <h4 style="margin-top: 0">web-based Python interpreter</h4>
       <a
         class="link-button button pinned-right enter-key-triggerable"
         href="about.html"
@@ -123,13 +124,27 @@
           >
         </div>
       </div>
-      <span data-kind="error" id="error-message"></span>
       <div id="terminal">
         <code class="terminal-panel" id="stdout"></code>
         <div id="stdout-resize"></div>
         <code class="terminal-panel" id="mypy-output"></code>
       </div>
       <script type="module" src="/src/main.js"></script>
+    </div>
+    <div id="error-block" style="margin: 10px; display: none">
+      <p data-kind="error">
+        Error loading web-python, see the developer console.
+      </p>
+      <p>
+        Due to the experimental nature of the local directory mounting feature,
+        this is not yet available on all browsers. As of the time of writing,
+        this is only available on Chrome and Edge. See the
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/API/Window/showDirectoryPicker"
+          >documentation for <code>showDirectoryPicker</code></a
+        >
+        for updates on the availability of native file system access.
+      </p>
     </div>
   </body>
 </html>

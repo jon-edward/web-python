@@ -2,12 +2,13 @@ html,
 body {
   padding: 0;
   margin: 0;
+  height: 100%;
 }
 
 #app {
   display: flex;
   flex-direction: column;
-  margin: 10px;
+  margin: 0px 10px;
   max-height: calc(100vh - 20px);
   flex-flow: column;
 
@@ -26,12 +27,13 @@ body {
 }
 
 #controls {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   font-family: monospace, monospace;
 }
 
@@ -72,7 +74,7 @@ p {
 
 code,
 pre {
-  font-size: large;
+  font-size: medium;
   background-color: #eeeeee;
   padding: 2px 6px;
   border-radius: 3px;
