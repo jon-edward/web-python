@@ -15,7 +15,7 @@
         href="index.html"
         >Home</a
       >
-      <h1>about web-python</h1>
+      <h1>about</h1>
       <p>
         <code>web-python</code> is a web-based Python interpreter powered by
         <a href="https://pyodide.org/">Pyodide</a>, leveraging its
@@ -33,38 +33,59 @@
         >
         for more information.
       </p>
-      <h2>using external packages</h2>
-      <p>
-        By including a <code>requirements.txt</code> file in your directory
-        root, you can specify external Python packages to be installed in the
-        interpreter before execution.
-      </p>
-      <p style="margin-bottom: 0">
-        Lines of <code>requirements.txt</code> are fed directly to
-        <a href="https://micropip.pyodide.org/en/stable/project/usage.html"
-          ><code>micropip.install</code></a
-        >. So, if you want to use <code>numpy</code>, <code>pandas</code>, and
-        <code>matplotlib</code>, then write a <code>requirements.txt</code> file
-        with the following content:
-      </p>
-      <pre>
+      <section>
+        <h2>usage</h2>
+        <p>
+          To use <code>web-python</code>, select a local directory to run Python
+          code in. Then, enter arguments to pass to the Python interpreter (for
+          example, <code>main.py arg1 arg2</code>), and click "Run".
+        </p>
+        <p>
+          Alternatively, you can execute one-liners without a local directory
+          much like you would with a normal Python interpreter: entering the
+          code in quotes with the <code>-c</code> flag. For example, to run the
+          Python code <code>print('hello world!')</code>, enter
+          <code>-c "print('hello world!')"</code> as Python arguments.
+        </p>
+      </section>
+      <section>
+        <h2>using external packages</h2>
+        <p>
+          By including a <code>requirements.txt</code> file in your directory
+          root, you can specify external Python packages to be installed in the
+          interpreter before execution.
+        </p>
+        <p style="margin-bottom: 0">
+          Lines of <code>requirements.txt</code> are fed directly to
+          <a href="https://micropip.pyodide.org/en/stable/project/usage.html"
+            ><code>micropip.install</code></a
+          >. So, if you want to use <code>numpy</code>, <code>pandas</code>, and
+          <code>matplotlib</code>, then write a
+          <code>requirements.txt</code> file with the following content:
+        </p>
+        <pre>
 numpy
 pandas
 matplotlib</pre
-      >
-      <p>This makes them available to Python code.</p>
-      <h2>ads??</h2>
-      <p>
-        Ads help support the development of this project. But, I understand that
-        if you're using this on a regular basis you might want to turn them off.
-        You can turn off ads by adding a <code>disable-ads</code> query
-        parameter to the URL. No questions asked.
-      </p>
-      <p>
-        If you want to support my work directly, you can
-        <a href="https://buymeacoffee.com/jon.edward">buy me a cup of coffee</a
-        >. Thanks!
-      </p>
+        >
+        <p>This makes them available to Python code.</p>
+      </section>
+      <section>
+        <h2>ads??</h2>
+        <p>
+          Ads help support the development of this project. But, I understand
+          that if you're using this on a regular basis you might want to turn
+          them off. You can turn off ads by adding a
+          <code>disable-ads</code> query parameter to the URL. No questions
+          asked.
+        </p>
+        <p>
+          If you want to support my work directly, you can
+          <a href="https://buymeacoffee.com/jon.edward"
+            >buy me a cup of coffee</a
+          >. Thanks!
+        </p>
+      </section>
     </div>
   </body>
 </html>

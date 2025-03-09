@@ -8,7 +8,7 @@ body {
 #app {
   display: flex;
   flex-direction: column;
-  margin: 0px 10px;
+  margin: 0px 15px;
   max-height: calc(100vh - 20px);
   flex-flow: column;
 
@@ -37,6 +37,10 @@ h4 {
   font-family: monospace, monospace;
 }
 
+h1 {
+  margin-top: 15px;
+}
+
 .controls-block {
   display: block;
   margin-top: 7px;
@@ -56,8 +60,8 @@ p {
 
 .pinned-right {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 15px;
+  right: 15px;
 }
 
 .button {
@@ -78,6 +82,10 @@ pre {
   background-color: #eeeeee;
   padding: 2px 6px;
   border-radius: 3px;
+}
+
+code {
+  white-space: nowrap;
 }
 
 input[type="text"] {

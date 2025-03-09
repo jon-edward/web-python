@@ -1,4 +1,5 @@
 import "./style.css";
+import "./about-style.css";
 
 const enterTriggerable = document.getElementsByClassName(
   "enter-key-triggerable"
