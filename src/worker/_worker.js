@@ -59,16 +59,16 @@ async function onInit(message) {
   try {
     const pyodide = await pyodidePromise;
 
-    pyodide.setInterruptBuffer(interruptBuffer);
-
     pyodide.setStdout({ batched: sendStdout });
     pyodide.setStderr({ batched: sendStderr });
+
+    pyodide.setInterruptBuffer(interruptBuffer);
 
     self.postMessage({ kind: "finished", id });
   } catch (e) {
     self.postMessage({
       kind: "finished",
-      error: error.message,
+      error: e.message,
       id,
     });
   }
