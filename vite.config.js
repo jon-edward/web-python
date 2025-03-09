@@ -8,7 +8,14 @@ export default defineConfig({
   server: {
     https: true,
   },
-  plugins: [wasm(), mkcert(), crossOriginIsolation(), Sitemap()],
+  plugins: [
+    wasm(),
+    mkcert(),
+    crossOriginIsolation(),
+    Sitemap({
+      hostname: "https://web-python.pages.dev/",
+    }),
+  ],
   build: {
     target: "ES2022",
     rollupOptions: {
