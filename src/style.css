@@ -103,7 +103,7 @@ code {
 }
 
 input[type="text"] {
-  @apply font-mono rounded-md text-sm mx-2 px-2 py-1;
+  @apply font-mono rounded-md text-sm px-2 py-1;
 }
 
 .handle-name,
