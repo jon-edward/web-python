@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  /*
+    Disable double-tap zoom on mobile devices
+  */
+  touch-action: manipulation;
+}
+
 .bg-secondary {
   @apply bg-stone-200 dark:bg-stone-800;
 }
@@ -168,4 +175,21 @@ button:disabled {
 
 #about-dialog::backdrop {
   @apply bg-stone-900/70 dark:bg-stone-500/70;
+}
+
+#error-block {
+  @apply m-2;
+
+  pre,
+  code {
+    @apply bg-stone-200 dark:bg-stone-800 p-0.5;
+  }
+
+  pre {
+    @apply overflow-x-auto px-2;
+  }
+
+  p {
+    @apply my-5;
+  }
 }
