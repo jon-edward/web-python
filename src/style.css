@@ -103,6 +103,7 @@ code {
 }
 
 input[type="text"] {
+  max-width: calc(100vw - var(--spacing) * 6);
   @apply font-mono rounded-md text-sm px-2 py-1;
 }
 
