@@ -1,226 +1,171 @@
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.bg-secondary {
+  @apply bg-stone-200 dark:bg-stone-800;
+}
+
+.bg-tertiary {
+  @apply bg-stone-300 dark:bg-stone-700;
+}
+
+.focusable {
+  @apply focus:outline-none focus:ring-stone-400 dark:focus:ring-stone-600 focus:ring-3;
+}
+
+.hoverable {
+  @apply hover:bg-stone-200 dark:hover:bg-stone-800;
+}
+
 html,
 body {
-  padding: 0;
-  margin: 0;
-  height: 100%;
+  @apply bg-stone-50 text-stone-900 dark:bg-stone-900 dark:text-stone-50 m-0 p-0 h-full;
 }
 
 #app {
-  display: flex;
-  flex-direction: column;
-  margin: 0px 15px;
-  max-height: calc(100vh - 20px);
-  flex-flow: column;
-
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  font-size: medium;
-}
-
-.link-button {
-  text-decoration: none;
-  color: inherit;
-}
-
-.link-button:visited {
-  color: inherit;
+  @apply p-2 max-h-screen flex flex-col;
 }
 
 #controls {
-  margin-bottom: 25px;
+  @apply mb-4 mt-2;
+}
+
+a {
+  @apply underline text-blue-600 dark:text-blue-400;
+}
+
+a:visited {
+  @apply text-violet-600 dark:text-violet-400;
 }
 
 h1,
 h2,
 h3,
 h4 {
-  font-family: monospace, monospace;
+  @apply font-bold font-mono;
 }
 
 h1 {
-  margin-top: 15px;
+  @apply text-4xl my-4;
+}
+
+h2 {
+  @apply text-3xl;
+}
+
+h3,
+h4 {
+  @apply text-2xl;
 }
 
 .controls-block {
-  display: block;
-  margin-top: 7px;
+  @apply my-1.5;
+}
+
+.controls-block > button,
+label > input[type="checkbox"] {
+  @apply mr-1;
+}
+
+input[type="checkbox"] {
+  @apply bg-stone-50 accent-violet-500;
 }
 
 h1 > img {
-  vertical-align: middle;
-}
-
-p {
-  margin-top: 0;
-}
-
-.button > button {
-  display: none;
+  @apply align-middle inline-block;
 }
 
 .pinned-right {
-  position: absolute;
-  top: 15px;
-  right: 15px;
+  @apply absolute right-4 top-4;
 }
 
-.button {
-  vertical-align: middle;
-  text-decoration: none;
-  font-size: medium;
-  background-color: #eeeeee;
-  color: #1f1f1f;
-  padding: 3px 6px;
-  border-radius: 3px;
-  user-select: none;
-  border: 1px solid #1f1f1f;
+label {
+  @apply flex flex-row items-center;
 }
 
 code,
 pre {
-  font-size: medium;
-  background-color: #eeeeee;
-  padding: 2px 6px;
-  border-radius: 3px;
+  @apply px-6 py-2 rounded-md;
 }
 
 code {
-  white-space: nowrap;
+  @apply whitespace-nowrap;
 }
 
 input[type="text"] {
-  /* vertical-align: middle; */
-  font-size: small;
-  padding: 5px 6px;
-  margin-top: 2px;
-  border-radius: 3px;
-  border: 1px solid #1f1f1f;
-  font-family: monospace, monospace;
-}
-
-.button:hover {
-  background-color: #d9d9d9;
-  cursor: pointer;
-}
-
-.controls-block:has(.button > button[disabled]) {
-  .handle-name {
-    opacity: 0.5;
-  }
-}
-
-.button:has(> button[disabled]) {
-  background-color: #757575;
-  color: #303030;
-  cursor: default;
+  @apply font-mono rounded-md text-sm mx-2 px-2 py-1;
 }
 
 .handle-name,
 .error-span {
-  margin-left: 10px;
-  font-family: monospace, monospace;
-  font-size: small;
+  @apply text-sm font-mono ml-2;
 }
 
-.terminal-panel > span[data-kind="error"] {
-  color: rgb(255, 104, 104);
-}
-
-.terminal-panel > span[data-kind="warning"] {
-  color: rgb(255, 202, 104);
-}
-
-.terminal-panel > span[data-kind="success"] {
-  color: rgb(152, 255, 104);
+*[data-kind="warning"] {
+  @apply text-yellow-800 dark:text-yellow-400;
 }
 
 *[data-kind="success"] {
-  color: green;
+  @apply text-lime-800 dark:text-lime-400;
 }
 
 *[data-kind="error"] {
-  color: red;
-  font-weight: bold;
+  @apply text-red-800 dark:text-red-400;
 }
 
 #terminal {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  overflow-y: auto;
+  @apply flex flex-row h-screen overflow-y-auto;
 }
 
 .terminal-panel {
-  white-space: pre-wrap;
-  background-color: #1f1f1f;
-  color: white;
-  border-radius: 2px;
-  color-scheme: dark;
-  overflow-y: auto;
-  padding: 10px;
-  word-wrap: break-word;
-  overflow-x: auto;
+  @apply p-3 overflow-auto break-words whitespace-pre-wrap;
 }
 
 #stdout {
-  width: 70%;
+  @apply w-7/10;
 }
 
 #mypy-output {
-  flex: 1 1 0px;
+  @apply flex-1;
 }
 
 #stdout-resize {
-  width: 8px;
-  cursor: col-resize;
+  @apply w-3 cursor-col-resize;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    background-color: #333333;
-    color: white;
+button {
+  @apply text-center cursor-pointer rounded-lg px-2 py-1;
+}
+
+button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+#about-dialog {
+  pre,
+  code {
+    @apply bg-stone-200 dark:bg-stone-800 p-0.5;
   }
 
-  .button {
-    background-color: #1f1f1f;
-    color: #eeeeee;
-    border: none;
-  }
-
-  .button:hover {
-    background-color: #292929;
-  }
-
-  input[type="text"] {
-    border: none;
-    background-color: #1f1f1f;
-    color: #eeeeee;
-  }
-
-  a {
-    color: #7568ff;
-  }
-
-  a:visited {
-    color: #f98fff;
-  }
-
-  .button:has(> button[disabled]) {
-    background-color: #757575;
-    color: #303030;
-  }
-
-  *[data-kind="success"] {
-    color: rgb(80, 255, 80);
-  }
-
-  *[data-kind="error"] {
-    color: rgb(255, 104, 104);
-    font-weight: bold;
-  }
-
-  code,
   pre {
-    background-color: #1f1f1f;
+    @apply overflow-x-auto px-2;
   }
+
+  p {
+    @apply my-5;
+  }
+
+  min-width: calc(100vw - var(--spacing) * 12);
+  max-width: calc(100vw - var(--spacing) * 12);
+  min-height: calc(100vh - var(--spacing) * 12);
+  max-height: calc(100vh - var(--spacing) * 12);
+  color-scheme: light dark;
+  @apply overflow-y-auto p-4 z-100 top-6 left-6 right-6 bottom-6 bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-50 rounded-md;
+}
+
+#about-dialog::backdrop {
+  @apply bg-stone-900/70 dark:bg-stone-500/70;
 }

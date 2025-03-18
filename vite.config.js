@@ -1,8 +1,10 @@
 import { defineConfig } from "vite";
+
 import mkcert from "vite-plugin-mkcert";
 import wasm from "vite-plugin-wasm";
 import crossOriginIsolation from "vite-plugin-cross-origin-isolation";
 import Sitemap from "vite-plugin-sitemap";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   server: {
@@ -15,14 +17,9 @@ export default defineConfig({
     Sitemap({
       hostname: "https://web-python.pages.dev/",
     }),
+    tailwindcss(),
   ],
   build: {
     target: "ES2022",
-    rollupOptions: {
-      input: {
-        main: "index.html",
-        about: "about.html",
-      },
-    },
   },
 });

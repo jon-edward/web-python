@@ -11,7 +11,40 @@ Select a local directory to run Python code in, enter arguments to pass to the P
 
 For example, to run the Python file "main.py" with arguments "arg1" and "arg2", enter "main.py arg1 arg2" as Python arguments.
 
-See the <a href="about.html">about page</a> for more information.`;
+See the <a href="/?about">about page</a> for more information.`;
+
+function openAboutPage() {
+  window.history.replaceState({}, document.title, "/?about");
+  document.getElementById("about-dialog").showModal();
+}
+
+function closeAboutPage() {
+  window.history.replaceState({}, document.title, "/");
+  document.getElementById("about-dialog").close();
+}
+
+if (new URLSearchParams(window.location.search).has("about")) {
+  openAboutPage();
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    // Override default behavior to close the about page and change history
+    event.preventDefault();
+    closeAboutPage();
+  }
+});
+
+document.getElementById("about-button").onclick = openAboutPage;
+document.getElementById("about-dialog-close-button").onclick = closeAboutPage;
+
+for (const button of document.getElementsByTagName("button")) {
+  button.classList.add("bg-tertiary", "hoverable", "focusable");
+}
+
+for (const input of document.getElementsByTagName("input")) {
+  input.classList.add("bg-secondary", "focusable");
+}
 
 async function init() {
   let pythonRunner = new PythonRunner();
@@ -349,7 +382,7 @@ async function init() {
           filename: "<string>",
         });
       } else {
-        const directoryHandle = await get("projectDirectoryHandle");
+        let directoryHandle = await get("projectDirectoryHandle");
         if (!directoryHandle) {
           stderrFunc("Tried to run a Python file, but no directory selected.");
           throw new RunnerError("No directory selected.");

@@ -6,49 +6,25 @@
     <meta name="author" content="jon-edward" />
     <meta name="keywords" content="python, web, interpreter, pyodide, wasm" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="google-adsense-account" content="ca-pub-5595948816944550" />
     <link rel="icon" type="image/png" href="/favicon.ico" />
     <title>web-python: Web-based Python interpreter</title>
-    <!-- <script type="text/javascript">
-      // block google ads by user url search parameter
-      if (new URL(window.location.href).searchParams.has("disable-ads")) {
-        window.adsbygoogle = {
-          enabled: true,
-          loaded: true,
-          push: function () {
-            return;
-          },
-          google_ad_client: "",
-          enable_page_level_ads: true,
-        };
-      }
-    </script> -->
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5595948816944550"
-      crossorigin="anonymous"
-    ></script>
     <script src="/enable-threads.js"></script>
   </head>
   <body>
     <div id="app">
-      <h1 style="margin-bottom: 8px">web-python</h1>
+      <h1 style="margin-bottom: 8px">
+        <img
+          src="/web-python-logo.svg"
+          height="36"
+          width="36"
+          class="mr-3 inline"
+        />web-python
+      </h1>
       <h4 style="margin-top: 0">web-based Python interpreter</h4>
-      <a
-        class="link-button button pinned-right enter-key-triggerable"
-        href="about.html"
-        >About</a
-      >
+      <button class="pinned-right" id="about-button">About</button>
       <div id="controls">
         <div class="controls-block">
-          <label
-            for="project-directory"
-            tabindex="0"
-            class="button enter-key-triggerable"
-            title="Select project directory. Must be writable"
-            >Select project directory<button
-              id="project-directory"
-            ></button></label
+          <button id="project-directory">Select project directory</button
           ><span class="handle-name" id="project-directory-name"
             >No directory selected</span
           >
@@ -64,47 +40,32 @@
               id="python-args"
               size="40"
               placeholder="main.py arg1 arg2 --key value" /><span
-              class="error-span"
+              class="error-span focusable bg-secondary"
               data-kind="error"
               id="python-args-error-span"
             ></span
           ></label>
         </div>
         <div class="controls-block">
-          <label
-            class="button enter-key-triggerable"
-            for="run-button"
-            tabindex="0"
-            title="Run Python code. The file is determined by the Python arguments"
-            >Run<button id="run-button" disabled></button></label
-          ><label
-            class="button enter-key-triggerable"
-            for="stop-button"
-            style="margin-left: 4px"
-            tabindex="0"
-            title="Stop running Python code"
-            >Stop<button id="stop-button" disabled></button></label
-          ><label
-            class="button enter-key-triggerable"
-            for="clear-button"
-            style="margin-left: 4px"
-            tabindex="0"
-            title="Clear terminal"
-            >Clear<button
-              id="clear-button"
-              onclick="document.getElementById('stdout').textContent = ''"
-            ></button
-          ></label>
+          <button id="run-button" disabled>Run</button
+          ><button id="stop-button" disabled>Stop</button
+          ><button
+            id="clear-button"
+            onclick="document.getElementById('stdout').textContent = ''"
+          >
+            Clear
+          </button>
         </div>
         <div class="controls-block">
           <label
             for="mypy-run-checkbox"
-            class="enter-key-triggerable"
             title="Enable/disable automatic mypy type checking"
+            class="enter-key-triggerable"
             ><input
               type="checkbox"
               id="mypy-run-checkbox"
               name="mypy-run-checkbox"
+              class="focusable"
             />Mypy type checking</label
           >
         </div>
@@ -118,16 +79,16 @@
               type="checkbox"
               id="clear-when-run-checkbox"
               name="clear-when-run-checkbox"
+              class="focusable"
             />Clear terminal when run</label
           >
         </div>
       </div>
       <div id="terminal">
-        <code class="terminal-panel" id="stdout"> </code>
+        <code class="terminal-panel bg-secondary" id="stdout"> </code>
         <div id="stdout-resize"></div>
-        <code class="terminal-panel" id="mypy-output"></code>
+        <code class="terminal-panel bg-secondary" id="mypy-output"></code>
       </div>
-      <script type="module" src="/src/main.js"></script>
     </div>
     <div id="error-block" style="margin: 10px; display: none">
       <p data-kind="error">
@@ -135,10 +96,79 @@
       </p>
       <p>
         <code>web-python</code> does not work on mobile devices or older
-        browsers. See the <a href="about.html">about page</a> for more
-        information about how to use <code>web-python</code> when you're on a
-        supported device and browser. This is tested on Chromium and Firefox.
+        browsers. See the <a href="/?about">about page</a> for more information
+        about how to use <code>web-python</code> when you're on a supported
+        device and browser. This is tested on Chromium and Firefox.
       </p>
     </div>
+    <dialog id="about-dialog">
+      <div style="position: fixed" class="right-12 top-12">
+        <button id="about-dialog-close-button">Close</button>
+      </div>
+      <h1>about</h1>
+      <p>
+        <code>web-python</code> is a web-based Python interpreter powered by
+        <a href="https://pyodide.org/">Pyodide</a>, leveraging its
+        <a
+          href="https://pyodide.org/en/stable/usage/file-system.html#experimental-using-the-native-file-system-in-the-browser"
+          >experimental local directory mounting feature</a
+        >
+        to sync the WASM filesystem with a local writable directory.
+      </p>
+      <p>
+        This feature is not yet available on all browsers. See
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/API/Window/showDirectoryPicker"
+          >documentation for <code>showDirectoryPicker</code></a
+        >
+        for more information.
+      </p>
+      <section>
+        <h2>usage</h2>
+        <p>
+          To use <code>web-python</code>, select a local directory to run Python
+          code in. Then, enter arguments to pass to the Python interpreter (for
+          example, <code>main.py arg1 arg2</code>), and click "Run".
+        </p>
+        <p>
+          Alternatively, you can execute one-liners without a local directory
+          much like you would with a normal Python interpreter: entering the
+          code in quotes with the <code>-c</code> flag. For example, to run the
+          Python code <code>print('hello world!')</code>, enter
+          <code>-c "print('hello world!')"</code> as Python arguments.
+        </p>
+      </section>
+      <section>
+        <h2>using external packages</h2>
+        <p>
+          By including a <code>requirements.txt</code> file in your directory
+          root, you can specify external Python packages to be installed in the
+          interpreter before execution.
+        </p>
+        <p>
+          Lines of <code>requirements.txt</code> are fed directly to
+          <a href="https://micropip.pyodide.org/en/stable/project/usage.html"
+            ><code>micropip.install</code></a
+          >. So, if you want to use <code>numpy</code>, <code>pandas</code>, and
+          <code>matplotlib</code>, then write a
+          <code>requirements.txt</code> file with the following content:
+        </p>
+        <pre>
+numpy
+pandas
+matplotlib</pre
+        >
+        <p>This makes them available to Python code.</p>
+      </section>
+      <section>
+        <h2>issues</h2>
+        <p>
+          If you have any questions, bugs, or feature requests, please open an
+          issue on
+          <a href="https://github.com/jon-edward/web-python/issues">GitHub</a>.
+        </p>
+      </section>
+    </dialog>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
