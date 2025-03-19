@@ -107,6 +107,10 @@ input[type="text"] {
   @apply font-mono rounded-md text-sm px-2 py-1;
 }
 
+.subtitle {
+  @apply text-2xl;
+}
+
 .handle-name,
 .error-span {
   @apply text-sm font-mono ml-2;
