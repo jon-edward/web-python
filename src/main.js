@@ -23,6 +23,21 @@ function closeAboutPage() {
   document.getElementById("about-dialog").close();
 }
 
+// Close the about page if the user clicks outside
+document
+  .getElementById("about-dialog")
+  .addEventListener("click", function (event) {
+    const rect = event.target.getBoundingClientRect();
+    const isInDialog =
+      rect.top <= event.clientY &&
+      event.clientY <= rect.top + rect.height &&
+      rect.left <= event.clientX &&
+      event.clientX <= rect.left + rect.width;
+    if (!isInDialog) {
+      closeAboutPage();
+    }
+  });
+
 if (new URLSearchParams(window.location.search).has("about")) {
   openAboutPage();
 }

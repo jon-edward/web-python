@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+:root {
+  scrollbar-color: var(--color-stone-300) transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    scrollbar-color: var(--color-stone-700) transparent;
+  }
+}
+
 * {
   /*
     Disable double-tap zoom on mobile devices
@@ -86,7 +96,7 @@ h1 > img {
 }
 
 label {
-  @apply flex flex-row items-center;
+  @apply flex flex-row items-center select-none;
 }
 
 code,
